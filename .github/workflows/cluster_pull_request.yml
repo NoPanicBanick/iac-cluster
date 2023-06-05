@@ -1,0 +1,43 @@
+name: 'cluster_pull_request'
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - iac/cluster/**
+      - .github/workflows/cluster_pull_request.yml
+
+permissions:
+  contents: read
+
+jobs:
+  pull_request:
+    name: 'pull_request'
+    runs-on: ubuntu-latest
+    environment: azure
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_AD_TENANT_ID }}
+      TF_VAR_do_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Terraform Init
+      working-directory: iac/cluster
+      run: terraform init
+
+    - name: Terraform Format
+      working-directory: iac/cluster
+      run: terraform fmt -check
+
+    - name: Terraform Plan
+      working-directory: iac/cluster
+      run: terraform plan -input=false
