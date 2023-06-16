@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: azure
     env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_AD_TENANT_ID }}
       TF_VAR_do_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
 
     defaults:
