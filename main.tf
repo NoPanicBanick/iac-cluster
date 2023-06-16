@@ -34,3 +34,14 @@ resource "azurerm_storage_share" "backups" {
   storage_account_name = azurerm_storage_account.overseerr.name
   quota                = 5 # 5 gigabytes
 }
+
+resource "kubernetes_secret" "backup-acct-secret" {
+  metadata {
+    name = "overseerr-acct"
+  }
+
+  data = {
+    azurestorageaccountname = azurerm_storage_account.overseerr.name
+    azurestorageaccountkey  = azurerm_storage_account.overseerr.primary_access_key
+  }
+}

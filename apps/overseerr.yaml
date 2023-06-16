@@ -19,10 +19,21 @@ spec:
         image: sctx/overseerr
         ports:
         - containerPort: 5055
+        # volumeMounts:
+        # - mountPath: "/app/config"
+        #   name: appconfig
         env:
           - name: LOG_LEVEL
             value: "debug"
-          - name": PORT
-            value: 5055
+          - name: PORT
+            value: "5055"
           - name: TZ
             value: "America/Chicago"
+      # volumes:
+      # - name: appconfig
+      #   csi:
+      #     driver: file.csi.azure.com
+      #     readOnly: false
+      #     volumeAttributes:
+      #       secretName: backups-acct
+      #       shareName: backups
