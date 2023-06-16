@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.34.0"
+      version = "=3.61.0"
     }
     digitalocean = {
       source  = "digitalocean/digitalocean"
@@ -22,9 +22,9 @@ provider "digitalocean" {
 }
 
 provider "kubernetes" {
-  host  = digitalocean_kubernetes_cluster.foo.endpoint
-  token = digitalocean_kubernetes_cluster.foo.kube_config[0].token
+  host  = digitalocean_kubernetes_cluster.k8s.endpoint
+  token = digitalocean_kubernetes_cluster.k8s.kube_config[0].token
   cluster_ca_certificate = base64decode(
-    digitalocean_kubernetes_cluster.foo.kube_config[0].cluster_ca_certificate
+    digitalocean_kubernetes_cluster.k8s.kube_config[0].cluster_ca_certificate
   )
 }
