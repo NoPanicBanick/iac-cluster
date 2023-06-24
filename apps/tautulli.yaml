@@ -1,90 +1,92 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: overseerr
+  name: tautulli
   labels:
-    name: overseerr
+    name: tautulli
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: overseerr-statefulset
-  namespace: overseerr
+  name: tautulli-statefulset
+  namespace: tautulli
   labels:
-    app: overseerr
+    app: tautulli
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: overseerr
+      app: tautulli
   template:
     metadata:
       labels:
-        app: overseerr
+        app: tautulli
     spec:
       containers:
-      - name: overseerr
-        image: sctx/overseerr
+      - name: tautulli
+        image: ghcr.io/tautulli/tautulli
         ports:
-        - containerPort: 5055
+        - containerPort: 8181
         volumeMounts:
-        - mountPath: "/app/config"
-          name: overseerr-pvc
+        - mountPath: "/config"
+          name: tautulli-pvc
         env:
           - name: LOG_LEVEL
             value: "debug"
-          - name: PORT
-            value: "5055"
+          - name: PUID
+            value: "1001"
+          - name: PGID
+            value: "1001"
           - name: TZ
             value: "America/Chicago"
   volumeClaimTemplates:
   - metadata:
-      name: overseerr-pvc
+      name: tautulli-pvc
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 5Gi
+          storage: 1Gi
       storageClassName: do-block-storage
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: overseerr-service
-  namespace: overseerr
+  name: tautulli-service
+  namespace: tautulli
   labels:
-    app: overseerr
+    app: tautulli
 spec:
   type: ClusterIP
   selector:
-    app: overseerr
+    app: tautulli
   ports:
   - port: 80
-    targetPort: 5055
+    targetPort: 8181
     protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: overseerr-ingress
-  namespace: overseerr
+  name: tautulli-ingress
+  namespace: tautulli
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
     - hosts:
-      - overseerr.freeceweed.com
+      - dashboard.freeceweed.com
       secretName: letsencrypt-prod
   rules:
-    - host: overseerr.freeceweed.com
+    - host: dashboard.freeceweed.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: overseerr-service
+                name: tautulli-service
                 port:
                   number: 80
