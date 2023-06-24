@@ -1,0 +1,40 @@
+name: 'deploy cluster'
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: 'deploy'
+    runs-on: ubuntu-latest
+    environment: azure
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_AD_TENANT_ID }}
+      TF_VAR_do_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - uses: actions/download-artifact@v3
+      with:
+        name: tfplan
+        path: artifacts
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Apply
+      run: terraform apply artifacts/tfplan -auto-approve -input=false
