@@ -26,8 +26,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - run: echo "action is - ${{ github.event.action}}"
-    - run: echo "triggering_actor is - ${{ github.triggering_actor}}"
+    - run: echo "event_name is - ${{ github.event_name}}"
     - run: mkdir -p publish
     
     - name: Terraform Init
