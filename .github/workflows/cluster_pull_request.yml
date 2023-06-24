@@ -10,6 +10,7 @@ permissions:
 jobs:
   pull_request:
     name: 'pull_request'
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     environment: azure
     env:
@@ -26,7 +27,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    
+    - run: echo "event_name is - ${{ github.event_name}}"
     - run: mkdir -p publish
     
     - name: Terraform Init
@@ -43,3 +44,25 @@ jobs:
         name: tfplan
         path: publish/tfplan
         if-no-files-found: error
+
+  deploy:
+    if: ${{ github.event_name != 'pull_request' }}
+    name: 'deploy'    
+    runs-on: ubuntu-latest
+    environment: azure
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_AD_TENANT_ID }}
+      TF_VAR_do_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+  
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - run: echo "event_name is - ${{ github.event_name}}"
