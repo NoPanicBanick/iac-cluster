@@ -9,10 +9,47 @@ permissions:
   contents: read
 
 jobs:
+  plan:
+    name: 'plan'
+    runs-on: ubuntu-latest
+    environment: env-plan
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_AD_TENANT_ID }}
+      TF_VAR_do_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - run: echo "event_name is - ${{ github.event_name}}"
+    - run: mkdir -p publish
+    
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    - name: Terraform Plan
+      run: terraform plan -input=false -out=publish/tfplan
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: tfplan
+        path: publish/tfplan
+        if-no-files-found: error
+
   deploy:
     name: 'deploy'
+    needs: plan
     runs-on: ubuntu-latest
-    environment: azure
+    environment: env-deploy
     env:
       ARM_CLIENT_ID: ${{ vars.AZURE_AD_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
