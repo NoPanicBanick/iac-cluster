@@ -26,7 +26,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
+    
+    - run: mkdir -p publish
+    
     - name: Terraform Init
       run: terraform init
 
@@ -34,4 +36,10 @@ jobs:
       run: terraform fmt -check
 
     - name: Terraform Plan
-      run: terraform plan -input=false
+      run: terraform plan -input=false -out=publish/tfplan
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: tfplan
+        path: publish/tfplan
+        if-no-files-found: error

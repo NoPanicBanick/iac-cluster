@@ -27,9 +27,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    
+    - uses: actions/download-artifact@v3
+      with:
+        name: tfplan
+        path: artifacts
 
     - name: Terraform Init
       run: terraform init
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false
+      run: terraform apply artifacts/tfplan -auto-approve -input=false
