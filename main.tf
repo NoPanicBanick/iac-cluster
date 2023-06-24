@@ -20,5 +20,5 @@ resource "kubernetes_namespace" "testing_plan" {
     name = "testingplan"
   }
 
-  depends_on = [ digitalocean_kubernetes_cluster.k8s ]
+  depends_on = [digitalocean_kubernetes_cluster.k8s]
 }
