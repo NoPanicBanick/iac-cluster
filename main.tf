@@ -14,3 +14,11 @@ resource "digitalocean_kubernetes_cluster" "k8s" {
     node_count = 1
   }
 }
+
+resource "kubernetes_namespace" "testing_plan" {
+  metadata {
+    name = "testingplan"
+  }
+
+  depends_on = [ digitalocean_kubernetes_cluster.k8s ]
+}
