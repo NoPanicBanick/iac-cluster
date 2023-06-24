@@ -10,7 +10,7 @@ permissions:
 jobs:
   pull_request:
     name: 'pull_request'
-    if: ${{ github.event_name }} == 'pull_request'
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     environment: azure
     env:
@@ -46,8 +46,8 @@ jobs:
         if-no-files-found: error
 
   deploy:
-    name: 'deploy'
-    if: ${{ github.event_name }} != 'pull_request'
+    if: ${{ github.event_name != 'pull_request' }}
+    name: 'deploy'    
     runs-on: ubuntu-latest
     environment: azure
     env:
