@@ -1,5 +1,4 @@
-name: 'vm_destroy'
-
+name: 'Destroy'
 on:
   workflow_dispatch:
 
@@ -10,7 +9,7 @@ jobs:
   vm_destroy:
     name: 'vm_destroy'
     runs-on: ubuntu-latest
-    environment: azure
+    environment: env-deploy
     env:
       ARM_CLIENT_ID: ${{ vars.AZURE_AD_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
@@ -27,9 +26,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Terraform Init
-      working-directory: iac/cluster
       run: terraform init
 
     - name: Terraform Destroy
-      working-directory: iac/cluster
       run: terraform destroy -auto-approve -input=false
