@@ -38,6 +38,10 @@ spec:
               value: "5055"
             - name: TZ
               value: "America/Chicago"
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
   volumeClaimTemplates:
     - metadata:
         name: overseerr-pvc
