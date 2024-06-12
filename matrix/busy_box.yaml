@@ -12,7 +12,27 @@ spec:
       volumeMounts:
         - mountPath: /pvc
           name: pvc-mount
+        - mountPath: /whatsapp
+          name: whatsapp-pvc
+        - mountPath: /slack
+          name: slack-pvc
+        - mountPath: /instagram
+          name: instagram-pvc
+        - mountPath: /discord
+          name: discord-pvc
   volumes:
     - name: pvc-mount
       persistentVolumeClaim:
         claimName: synapse-pv-claim
+    - name: whatsapp-pvc
+      persistentVolumeClaim:
+        claimName: whatsapp-pvc-whatsapp-bridge-0
+    - name: slack-pvc
+      persistentVolumeClaim:
+        claimName: slack-pvc-slack-bridge-0
+    - name: instagram-pvc
+      persistentVolumeClaim:
+        claimName: instagram-pvc-instagram-bridge-0
+    - name: discord-pvc
+      persistentVolumeClaim:
+        claimName: discord-pvc-discord-bridge-0

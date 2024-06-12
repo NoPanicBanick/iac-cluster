@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: instagram-service
+  namespace: matrix
+  labels:
+    app: instagram
+spec:
+  type: ClusterIP
+  selector:
+    app: instagram
+  ports:
+    - name: http
+      port: 29319
+      protocol: TCP
+      targetPort: 29319

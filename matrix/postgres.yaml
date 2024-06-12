@@ -75,17 +75,3 @@ spec:
         - name: postgresdata
           persistentVolumeClaim:
             claimName: postgres-synapse-claim
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres
-  namespace: matrix
-  labels:
-    app: postgres
-spec:
-  type: NodePort
-  ports:
-    - port: 5432
-  selector:
-    app: postgres

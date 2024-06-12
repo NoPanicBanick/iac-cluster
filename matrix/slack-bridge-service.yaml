@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: slack-service
+  namespace: matrix
+  labels:
+    app: slack
+spec:
+  type: ClusterIP
+  selector:
+    app: slack
+  ports:
+    - name: http
+      port: 29335
+      protocol: TCP
+      targetPort: 29335

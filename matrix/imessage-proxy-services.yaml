@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: imessage-proxy
+  namespace: matrix
+  labels:
+    app: imessage
+spec:
+  type: ClusterIP
+  selector:
+    app: imessage
+  ports:
+    - name: http
+      port: 29331
+      protocol: TCP
+      targetPort: 29331
+    # - name: websocket
+    #   port: 29332
+    #   protocol: TCP
+    #   targetPort: 29332

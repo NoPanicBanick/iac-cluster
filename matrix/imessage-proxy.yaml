@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imessage-proxy
+  namespace: matrix
+spec:
+  selector:
+    matchLabels:
+      app: imessage
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: imessage
+    spec:
+      containers:
+        - image: dock.mau.dev/mautrix/wsproxy:latest
+          name: imessage
+          resources:
+            requests:
+              memory: "200Mi"
+              cpu: "50m"
+            limits:
+              memory: "400Mi"
+              cpu: "200m"
+          env:
+            - name: SYNAPSE_SERVER_NAME
+              value: "ryleycoyote.com"
+            - name: SYNAPSE_REPORT_STATS
+              value: "no"
+            # - name: LISTEN_ADDRESS
+            #   value: "29331"
+            - name: APPSERVICE_ID
+              value: "imessage"
+            - name: AS_TOKEN
+              value: "VRf5z9J8GIAdnAJ05CAfUCfKdiFUtbFEpoVvzM2c7Bt55TZips7vocM5q42rZt5j"
+            - name: HS_TOKEN
+              value: "5BFPZfzPYm6XcJ7bPMFjDNmzgA33Cp5FSOU13JFTqejusplgCMGeZsehtFs1rN8s"
+              # These URLs will work as-is with docker networking
+            - name: SYNC_PROXY_URL
+              value: "http://imessage-proxysync.matrix.svc.cluster.local:29332"
+            - name: "SYNC_PROXY_WSPROXY_URL"
+              value: "http://imessage-proxy.matrix.svc.cluster.local:29331"
+            - name: SYNC_PROXY_SHARED_SECRET
+              value: "Lyricist-Peso7-Regulate"
+          ports:
+            # - containerPort: 29332
+            - containerPort: 29331
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 10.43.0.10
+          - 8.8.8.8
