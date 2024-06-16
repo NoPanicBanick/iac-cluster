@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: whatsapp-service
-  namespace: matrix
+  name: instagram-service
   labels:
-    app: whatsapp
+    app: instagram
 spec:
   type: ClusterIP
   selector:
-    app: whatsapp
+    app: instagram
   ports:
     - name: http
-      port: 29318
+      port: 29319
       protocol: TCP
-      targetPort: 29318
+      targetPort: 29319

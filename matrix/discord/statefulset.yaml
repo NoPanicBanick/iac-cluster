@@ -1,36 +1,35 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: whatsapp-bridge
-  namespace: matrix
+  name: discord-bridge
   labels:
-    app: whatsapp
+    app: discord
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: whatsapp
-  serviceName: whatsapp-svc
+      app: discord
+  serviceName: discord-svc
   template:
     metadata:
       labels:
-        app: whatsapp
+        app: discord
     spec:
       containers:
-        - name: whatsapp
-          image: dock.mau.dev/mautrix/whatsapp:latest
+        - name: discord
+          image: dock.mau.dev/mautrix/discord:latest
           resources:
             requests:
-              memory: "200Mi"
+              memory: "50Mi"
               cpu: "50m"
             limits:
-              memory: "400Mi"
-              cpu: "200m"
+              memory: "100Mi"
+              cpu: "100m"
           ports:
-            - containerPort: 29318
+            - containerPort: 29334
           volumeMounts:
             - mountPath: "/data"
-              name: whatsapp-pvc
+              name: discord-pvc
       dnsPolicy: "None"
       dnsConfig:
         nameservers:
@@ -38,7 +37,7 @@ spec:
           - 8.8.8.8
   volumeClaimTemplates:
     - metadata:
-        name: whatsapp-pvc
+        name: discord-pvc
       spec:
         accessModes:
           - ReadWriteOnce

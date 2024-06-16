@@ -4,7 +4,6 @@ metadata:
   labels:
     app: synapse
   name: synapse-nodeport
-  namespace: matrix
 spec:
   type: NodePort
   ports:
@@ -12,6 +11,6 @@ spec:
       port: 8008
       targetPort: 8008
       protocol: TCP
-      nodePort: 30010
+      nodePort: 30015
   selector:
     app: synapse

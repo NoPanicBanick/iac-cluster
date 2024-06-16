@@ -1,36 +1,35 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: signal-bridge
-  namespace: matrix
+  name: whatsapp-bridge
   labels:
-    app: signal
+    app: whatsapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: signal
-  serviceName: signal-svc
+      app: whatsapp
+  serviceName: whatsapp-svc
   template:
     metadata:
       labels:
-        app: signal
+        app: whatsapp
     spec:
       containers:
-        - name: signal
-          image: dock.mau.dev/mautrix/signal:latest
+        - name: whatsapp
+          image: dock.mau.dev/mautrix/whatsapp:latest
           resources:
             requests:
-              memory: "200Mi"
+              memory: "50Mi"
               cpu: "50m"
             limits:
-              memory: "400Mi"
+              memory: "100Mi"
               cpu: "200m"
           ports:
-            - containerPort: 29328
+            - containerPort: 29318
           volumeMounts:
             - mountPath: "/data"
-              name: signal-pvc
+              name: whatsapp-pvc
       dnsPolicy: "None"
       dnsConfig:
         nameservers:
@@ -38,7 +37,7 @@ spec:
           - 8.8.8.8
   volumeClaimTemplates:
     - metadata:
-        name: signal-pvc
+        name: whatsapp-pvc
       spec:
         accessModes:
           - ReadWriteOnce
