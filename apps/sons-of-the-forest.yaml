@@ -1,0 +1,144 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forest-server-config
+  namespace: dev
+  labels:
+    app: forest
+data:
+  dedicatedserver.cfg: |
+    {
+      "IpAddress": "0.0.0.0",
+      "GamePort": 8766,
+      "QueryPort": 27016,
+      "BlobSyncPort": 9700,
+      "ServerName": "beatons-bedtime",
+      "MaxPlayers": 8,
+      "Password": "",
+      "LanOnly": false,
+      "SaveSlot": 1,
+      "SaveMode": "Continue",
+      "GameMode": "Normal",
+      "SaveInterval": 600,
+      "IdleDayCycleSpeed": 0.0,
+      "IdleTargetFramerate": 5,
+      "ActiveTargetFramerate": 60,
+      "LogFilesEnabled": false,
+      "TimestampLogFilenames": true,
+      "TimestampLogEntries": true,
+      "GameSettings": {},
+      "CustomGameModeSettings": {}
+    }
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sons-of-the-forest-server
+  namespace: dev
+  labels:
+    app: forest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forest
+  serviceName: forest-svc
+  template:
+    metadata:
+      labels:
+        app: forest
+    spec:
+      containers:
+        - name: forest
+          image: jammsen/sons-of-the-forest-dedicated-server:latest
+          resources:
+            requests:
+              memory: "4096Mi"
+              cpu: "2000m"
+            limits:
+              memory: "10240Mi"
+              cpu: "4000m"
+          ports:
+            - name: port1
+              containerPort: 8766
+            - name: port2
+              containerPort: 27016
+            - name: port3
+              containerPort: 9700
+          volumeMounts:
+            - name: forest-steam-pvc
+              mountPath: "/steamcmd"
+            - name: forest-server-pvc
+              mountPath: "/sonsoftheforest"
+            - name: forest-wine-pvc
+              mountPath: "/winedata"
+            - name: serverconfig
+              mountPath: /sonsoftheforest/userdata/dedicatedserver.cfg
+              subPath: dedicatedserver.cfg
+          env:
+            - name: ALWAYS_UPDATE_ON_START
+              value: "1"
+      volumes:
+        - name: serverconfig
+          configMap:
+            name: forest-server-config
+            items:
+              - key: dedicatedserver.cfg
+                path: dedicatedserver.cfg
+  volumeClaimTemplates:
+    - metadata:
+        name: forest-steam-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: local-path
+    - metadata:
+        name: forest-server-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: local-path
+    - metadata:
+        name: forest-wine-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: local-path
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: forest
+  name: sons-of-the-forest-server-svc
+  namespace: dev
+spec:
+  type: NodePort
+  ports:
+    - name: port1
+      port: 8766
+      targetPort: 8766
+      protocol: UDP
+      nodePort: 30001
+    - name: port2
+      port: 27016
+      targetPort: 27016
+      protocol: UDP
+      nodePort: 30002
+    - name: port3
+      port: 9700
+      targetPort: 9700
+      protocol: UDP
+      nodePort: 30003
+  selector:
+    app: forest

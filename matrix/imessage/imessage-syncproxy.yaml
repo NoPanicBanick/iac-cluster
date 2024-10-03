@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imessage-proxysync
+  namespace: matrix
+spec:
+  selector:
+    matchLabels:
+      app: imessage-proxysync
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: imessage-proxysync
+    spec:
+      containers:
+        - image: dock.mau.dev/mautrix/syncproxy:latest
+          name: imessage
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "50m"
+            limits:
+              memory: "100Mi"
+              cpu: "200m"
+          env:
+            - name: DATABASE_URL
+              value: "postgres://synapse-db:Unawake-Prompter-Nanometer7@postgres.matrix.svc.cluster.local/imessage?sslmode=disable"
+            - name: HOMESERVER_URL
+              value: "http://synapse-service.matrix.svc.cluster.local:8008"
+            - name: SHARED_SECRET
+              value: "Lyricist-Peso7-Regulate"
+
+          ports:
+            - containerPort: 29332
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 10.43.0.10
+          - 8.8.8.8

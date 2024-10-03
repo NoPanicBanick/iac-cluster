@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rocket-api
+  namespace: rocket
+  labels:
+    app: rocket-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rocket-api
+  template:
+    metadata:
+      labels:
+        app: rocket-api
+    spec:
+      containers:
+        - name: rocket-api
+          imagePullPolicy: Always
+          image: bubba95x/rocket-api:main
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: mariadb__server
+              value: "rocket-stats-db-svc.rocket.svc.cluster.local"
+            - name: mariadb__database
+              value: "RocketStats"
+            - name: mariadb__user
+              value: "root"
+            - name: mariadb__password
+              valueFrom:
+                secretKeyRef:
+                  name: rocketdb-root-password
+                  key: password
+            - name: mariadb__port
+              value: "3306"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rocket-api-svc
+  namespace: rocket
+  labels:
+    app: rocket-api
+spec:
+  type: ClusterIP
+  selector:
+    app: rocket-api
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP

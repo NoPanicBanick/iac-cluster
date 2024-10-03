@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: imessage
+  name: imessage-proxy-port
+  namespace: matrix
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 29331
+      targetPort: 29331
+      nodePort: 30020
+  selector:
+    app: imessage

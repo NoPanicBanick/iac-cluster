@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: abiotic-factor-server
+  namespace: factor
+  labels:
+    app: abiotic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: abiotic
+  serviceName: abiotic-svc
+  template:
+    metadata:
+      labels:
+        app: abiotic
+    spec:
+      containers:
+        - name: abiotic
+          image: ghcr.io/pleut/abiotic-factor-linux-docker:latest
+          # resources:
+          #   requests:
+          #     memory: "4096Mi"
+          #     cpu: "2000m"
+          #   limits:
+          #     memory: "10240Mi"
+          #     cpu: "4000m"
+          ports:
+            - name: game
+              containerPort: 7777
+            - name: query
+              containerPort: 27015
+          volumeMounts:
+            - name: abiotic-gamefiles-pvc
+              mountPath: "/server"
+            - name: abiotic-server-pvc
+              mountPath: "/server/AbioticFactor/Saved"
+          env:
+            - name: MaxServerPlayers
+              value: "6"
+            - name: Port
+              value: "7777"
+            - name: QueryPort
+              value: "27015"
+            - name: ServerPassword
+              value: "viscous-boozy-thrower"
+            - name: SteamServerName
+              value: "Red Lemmon Factory"
+            - name: UsePerfThreads
+              value: "true"
+            - name: NoAsyncLoadingThread
+              value: "true"
+            - name: WorldSaveName
+              value: "RedLemmons"
+            - name: AutoUpdate
+              value: "true"
+  volumeClaimTemplates:
+    - metadata:
+        name: abiotic-gamefiles-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: local-path
+    - metadata:
+        name: abiotic-server-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: local-path

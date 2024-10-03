@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dont-starve-statefulset
+  namespace: games
+  labels:
+    app: dont-starve
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dont-starve
+  serviceName: dont-starve
+  template:
+    metadata:
+      labels:
+        app: dont-starve
+    spec:
+      containers:
+      - name: dont-starve
+        image: jamesits/dst-server:latest
+        # resources:
+        #   requests:
+        #     memory: "200Mi"
+        #     cpu: "50m"
+        #   limits:
+        #     memory: "400Mi"
+        #     cpu: "200m"
+        ports:
+        - containerPort: 10999
+        - containerPort: 11000
+        - containerPort: 12346
+        - containerPort: 12347
+        volumeMounts:
+        - mountPath: "/data"
+          name: dont-starve-pvc
+        env:
+          - name: DST_CLUSTER_TOKEN
+            value: "pds-g^KU_LgfunEWu^Y5ibR6pBbI/eIbu/iAwcAHRjHM247CJNRKWx3mhJZ1c="
+  volumeClaimTemplates:
+  - metadata:
+      name: dont-starve-pvc
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: local-path
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dont-starve-svc
+  namespace: plex
+  labels:
+    app: dont-starve
+spec:
+  type: ClusterIP
+  selector:
+    app: dont-starve
+  ports:
+  - name: udp-10999
+    port: 10999
+    targetPort: 10999
+    protocol: UDP
+  - name: udp-11000
+    port: 11000
+    targetPort: 11000
+    protocol: UDP
+  - name: udp-12346
+    port: 12346
+    targetPort: 12346
+    protocol: UDP
+  - name: udp-12347
+    port: 12347
+    targetPort: 12347
+    protocol: UDP
